@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router'
-import { Home } from './pages/Home'
-import { DerDieDas } from './pages/DerDieDas'
+import { BrowserRouter, Routes, Route } from 'react-router';
+import { Home } from './pages/Home';
+import { DerDieDas } from './pages/DerDieDas';
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
         <Route path="/der-die-das" element={<DerDieDas />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,11 +1,11 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface GameCardProps {
-  icon: ReactNode
-  title: string
-  subtitle: string
-  actionText?: string
-  onClick?: () => void
+  icon: ReactNode;
+  title: string;
+  subtitle: string;
+  actionText?: string;
+  onClick?: () => void;
 }
 
 export function GameCard({
@@ -51,5 +51,5 @@ export function GameCard({
         </div>
       </div>
     </button>
-  )
+  );
 }

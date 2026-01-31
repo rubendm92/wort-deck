@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { PageLayout } from '../components/PageLayout'
-import { getWords, type Word } from '../services/wordService'
+import { useEffect, useState } from 'react';
+import { PageLayout } from '../components/PageLayout';
+import { getWords, type Word } from '../services/wordService';
 
 export function DerDieDas() {
-  const [words, setWords] = useState<Word[]>([])
+  const [words, setWords] = useState<Word[]>([]);
 
   useEffect(() => {
-    getWords().then(setWords)
-  }, [])
+    getWords().then(setWords);
+  }, []);
 
   return (
     <PageLayout>
@@ -41,5 +41,5 @@ export function DerDieDas() {
         </div>
       </div>
     </PageLayout>
-  )
+  );
 }

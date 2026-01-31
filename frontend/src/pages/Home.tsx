@@ -1,12 +1,12 @@
-import { useNavigate } from 'react-router'
-import { DerDieDasIcon } from '../components/DerDieDasIcon'
-import { GameCard } from '../components/GameCard'
-import { PageLayout } from '../components/PageLayout'
-import { useGreeting } from '../hooks/useGreeting'
+import { useNavigate } from 'react-router';
+import { DerDieDasIcon } from '../components/DerDieDasIcon';
+import { GameCard } from '../components/GameCard';
+import { PageLayout } from '../components/PageLayout';
+import { useGreeting } from '../hooks/useGreeting';
 
 export function Home() {
-  const greeting = useGreeting()
-  const navigate = useNavigate()
+  const greeting = useGreeting();
+  const navigate = useNavigate();
 
   return (
     <PageLayout>
@@ -27,7 +27,6 @@ export function Home() {
           onClick={() => navigate('/der-die-das')}
         />
       </main>
-
     </PageLayout>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface PageLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function PageLayout({ children }: PageLayoutProps) {
@@ -12,5 +12,5 @@ export function PageLayout({ children }: PageLayoutProps) {
         Lerne Deutsch mit Spaß
       </footer>
     </div>
-  )
+  );
 }

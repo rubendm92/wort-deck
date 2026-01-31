@@ -1,8 +1,8 @@
-export type Article = 'der' | 'die' | 'das'
+export type Article = 'der' | 'die' | 'das';
 
 export interface Word {
-  word: string
-  article: Article
+  word: string;
+  article: Article;
 }
 
 const words: Word[] = [
@@ -16,8 +16,8 @@ const words: Word[] = [
   { word: 'Lampe', article: 'die' },
   { word: 'Buch', article: 'das' },
   { word: 'Stuhl', article: 'der' },
-]
+];
 
 export async function getWords(): Promise<Word[]> {
-  return words
+  return words;
 }
