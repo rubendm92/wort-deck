@@ -1,11 +1,19 @@
+import { useEffect, useState } from 'react'
 import { PageLayout } from '../components/PageLayout'
+import { getWords, type Word } from '../services/wordService'
 
 export function DerDieDas() {
+  const [words, setWords] = useState<Word[]>([])
+
+  useEffect(() => {
+    getWords().then(setWords)
+  }, [])
+
   return (
     <PageLayout>
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <div className="text-slate-400 text-sm sm:text-base font-medium">
-          1 / 10
+          1 / {words.length}
         </div>
 
         <div className="w-full bg-slate-800 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl">
