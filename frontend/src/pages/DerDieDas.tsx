@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { DerDieDasIcon } from '../components/DerDieDasIcon';
 import { PageLayout } from '../components/PageLayout';
 import { getWords, type Word } from '../services/wordService';
 
@@ -11,6 +12,11 @@ export function DerDieDas() {
 
   return (
     <PageLayout>
+      <header className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8">
+        <DerDieDasIcon />
+        <h1 className="text-2xl sm:text-3xl font-bold text-white">Der Die Das</h1>
+      </header>
+
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <div className="text-slate-400 text-sm sm:text-base font-medium">
           1 / {words.length}
