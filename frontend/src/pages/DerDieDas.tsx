@@ -18,11 +18,10 @@ export function DerDieDas() {
       </header>
 
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
-        <div className="text-slate-400 text-sm sm:text-base font-medium">
-          1 / {words.length}
-        </div>
-
-        <div className="w-full bg-slate-800 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl">
+        <div className="w-full relative bg-slate-800 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl">
+          <span className="absolute top-3 right-4 sm:top-4 sm:right-5 text-slate-400 text-sm sm:text-base font-medium">
+            1 / {words.length}
+          </span>
           <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center">
             Apfel
           </p>
