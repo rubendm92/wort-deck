@@ -4,6 +4,8 @@ import type { ButtonState } from '../domain/state.ts';
 interface AnswerButtonProps {
   article: Article;
   buttonState: ButtonState;
+  isCorrect: boolean;
+  isIncorrect: boolean;
   disabled: boolean;
   onClick: () => void;
 }
@@ -11,6 +13,8 @@ interface AnswerButtonProps {
 export function AnswerButton({
   article,
   buttonState,
+  isCorrect,
+  isIncorrect,
   disabled,
   onClick,
 }: AnswerButtonProps) {
@@ -25,7 +29,7 @@ export function AnswerButton({
       <p className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">
         {label}
       </p>
-      {buttonState === 'correct' && (
+      {isCorrect && (
         <span className="absolute -top-2 -right-2 bg-white rounded-full p-1">
           <svg
             className="w-4 h-4 text-emerald-500"
@@ -42,7 +46,7 @@ export function AnswerButton({
           </svg>
         </span>
       )}
-      {buttonState === 'incorrect' && (
+      {isIncorrect && (
         <span className="absolute -top-2 -right-2 bg-white rounded-full p-1">
           <svg
             className="w-4 h-4 text-red-500"

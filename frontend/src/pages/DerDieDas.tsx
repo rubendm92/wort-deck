@@ -14,6 +14,8 @@ import {
   submitAnswer,
   nextWord,
   getButtonState,
+  isAnswerCorrect,
+  isAnswerIncorrect,
 } from '../games/DerDieDas/domain/state.ts';
 
 export function DerDieDas() {
@@ -82,6 +84,8 @@ export function DerDieDas() {
               key={article}
               article={article}
               buttonState={getButtonState(gameState, article)}
+              isCorrect={isAnswerCorrect(gameState, article)}
+              isIncorrect={isAnswerIncorrect(gameState, article)}
               disabled={answered}
               onClick={() => handleAnswer(article)}
             />

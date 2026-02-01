@@ -59,15 +59,29 @@ export function getButtonState(
   if (!state?.selectedAnswer) {
     return 'default';
   }
-
-  const currentWord = getCurrentWord(state);
-  if (article === currentWord?.article) {
+  if (isAnswerCorrect(state, article)) {
     return 'correct';
   }
-
-  if (article === state.selectedAnswer) {
+  if (isAnswerIncorrect(state, article)) {
     return 'incorrect';
   }
-
   return 'dimmed';
+}
+
+export function isAnswerCorrect(
+  state: GameState | null,
+  article: Article
+): boolean {
+  if (!state?.selectedAnswer) return false;
+  const currentWord = getCurrentWord(state);
+  return article === currentWord?.article;
+}
+
+export function isAnswerIncorrect(
+  state: GameState | null,
+  article: Article
+): boolean {
+  if (!state?.selectedAnswer) return false;
+  const currentWord = getCurrentWord(state);
+  return article === state.selectedAnswer && article !== currentWord?.article;
 }

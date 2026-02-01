@@ -1,0 +1,297 @@
+import { describe, it, expect } from 'vitest';
+import {
+  createInitialState,
+  getCurrentWord,
+  isLastWord,
+  hasAnswered,
+  submitAnswer,
+  nextWord,
+  getButtonState,
+  isAnswerCorrect,
+  isAnswerIncorrect,
+  type GameState,
+} from './state';
+import type { Word } from './words';
+
+const testWords: Word[] = [
+  { word: 'Apfel', article: 'der' },
+  { word: 'Banane', article: 'die' },
+  { word: 'Brot', article: 'das' },
+];
+
+describe('createInitialState', () => {
+  it('creates state with words at index 0 and no answer', () => {
+    const state = createInitialState(testWords);
+
+    expect(state.words).toBe(testWords);
+    expect(state.currentIndex).toBe(0);
+    expect(state.selectedAnswer).toBeNull();
+  });
+});
+
+describe('getCurrentWord', () => {
+  it('returns undefined for null state', () => {
+    expect(getCurrentWord(null)).toBeUndefined();
+  });
+
+  it('returns the word at current index', () => {
+    const state = createInitialState(testWords);
+
+    expect(getCurrentWord(state)).toEqual({ word: 'Apfel', article: 'der' });
+  });
+
+  it('returns the word at updated index', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 1,
+      selectedAnswer: null,
+    };
+
+    expect(getCurrentWord(state)).toEqual({ word: 'Banane', article: 'die' });
+  });
+});
+
+describe('isLastWord', () => {
+  it('returns false for null state', () => {
+    expect(isLastWord(null)).toBe(false);
+  });
+
+  it('returns false when not on last word', () => {
+    const state = createInitialState(testWords);
+
+    expect(isLastWord(state)).toBe(false);
+  });
+
+  it('returns true when on last word', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 2,
+      selectedAnswer: null,
+    };
+
+    expect(isLastWord(state)).toBe(true);
+  });
+});
+
+describe('hasAnswered', () => {
+  it('returns false for null state', () => {
+    expect(hasAnswered(null)).toBe(false);
+  });
+
+  it('returns false when no answer selected', () => {
+    const state = createInitialState(testWords);
+
+    expect(hasAnswered(state)).toBe(false);
+  });
+
+  it('returns true when answer is selected', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+
+    expect(hasAnswered(state)).toBe(true);
+  });
+});
+
+describe('submitAnswer', () => {
+  it('returns null for null state', () => {
+    const result = submitAnswer('der')(null);
+
+    expect(result).toBeNull();
+  });
+
+  it('sets the selected answer', () => {
+    const state = createInitialState(testWords);
+    const result = submitAnswer('die')(state);
+
+    expect(result?.selectedAnswer).toBe('die');
+  });
+
+  it('does not change answer if already answered', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+    const result = submitAnswer('die')(state);
+
+    expect(result?.selectedAnswer).toBe('der');
+  });
+
+  it('preserves other state properties', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 1,
+      selectedAnswer: null,
+    };
+    const result = submitAnswer('das')(state);
+
+    expect(result?.words).toBe(testWords);
+    expect(result?.currentIndex).toBe(1);
+  });
+});
+
+describe('nextWord', () => {
+  it('returns null for null state', () => {
+    expect(nextWord(null)).toBeNull();
+  });
+
+  it('increments current index', () => {
+    const state = createInitialState(testWords);
+    const result = nextWord(state);
+
+    expect(result?.currentIndex).toBe(1);
+  });
+
+  it('clears the selected answer', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+    const result = nextWord(state);
+
+    expect(result?.selectedAnswer).toBeNull();
+  });
+});
+
+describe('getButtonState', () => {
+  it('returns default for null state', () => {
+    expect(getButtonState(null, 'der')).toBe('default');
+  });
+
+  it('returns default when no answer selected', () => {
+    const state = createInitialState(testWords);
+
+    expect(getButtonState(state, 'der')).toBe('default');
+    expect(getButtonState(state, 'die')).toBe('default');
+    expect(getButtonState(state, 'das')).toBe('default');
+  });
+
+  it('returns correct for the right answer', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+
+    expect(getButtonState(state, 'der')).toBe('correct');
+  });
+
+  it('returns incorrect for wrong selected answer', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(getButtonState(state, 'die')).toBe('incorrect');
+  });
+
+  it('returns dimmed for non-selected wrong answers', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(getButtonState(state, 'das')).toBe('dimmed');
+  });
+
+  it('returns correct even when wrong answer was selected', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(getButtonState(state, 'der')).toBe('correct');
+  });
+});
+
+describe('isAnswerCorrect', () => {
+  it('returns false for null state', () => {
+    expect(isAnswerCorrect(null, 'der')).toBe(false);
+  });
+
+  it('returns false when no answer selected', () => {
+    const state = createInitialState(testWords);
+
+    expect(isAnswerCorrect(state, 'der')).toBe(false);
+  });
+
+  it('returns true for the correct article', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+
+    expect(isAnswerCorrect(state, 'der')).toBe(true);
+  });
+
+  it('returns true for correct article even when wrong answer selected', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(isAnswerCorrect(state, 'der')).toBe(true);
+  });
+
+  it('returns false for wrong articles', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+
+    expect(isAnswerCorrect(state, 'die')).toBe(false);
+    expect(isAnswerCorrect(state, 'das')).toBe(false);
+  });
+});
+
+describe('isAnswerIncorrect', () => {
+  it('returns false for null state', () => {
+    expect(isAnswerIncorrect(null, 'der')).toBe(false);
+  });
+
+  it('returns false when no answer selected', () => {
+    const state = createInitialState(testWords);
+
+    expect(isAnswerIncorrect(state, 'die')).toBe(false);
+  });
+
+  it('returns true for the selected wrong answer', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(isAnswerIncorrect(state, 'die')).toBe(true);
+  });
+
+  it('returns false for the correct answer', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'der',
+    };
+
+    expect(isAnswerIncorrect(state, 'der')).toBe(false);
+  });
+
+  it('returns false for non-selected wrong answers', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 0,
+      selectedAnswer: 'die',
+    };
+
+    expect(isAnswerIncorrect(state, 'das')).toBe(false);
+  });
+});
