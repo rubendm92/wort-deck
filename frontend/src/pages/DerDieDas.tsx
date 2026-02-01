@@ -2,33 +2,33 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DerDieDasIcon } from '../components/DerDieDasIcon';
 import { PageLayout } from '../components/PageLayout';
-import { getWords, type Word, type Article } from '../services/wordService';
+import { getWords, type Article } from '../services/wordService';
+import {
+  type GameState,
+  type ButtonState,
+  createInitialState,
+  getCurrentWord,
+  isLastWord,
+  hasAnswered,
+  submitAnswer,
+  nextWord,
+  getButtonState,
+} from '../services/derDieDasGame';
 
 export function DerDieDas() {
-  const [words, setWords] = useState<Word[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<Article | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getWords().then(setWords);
+    getWords().then((words) => setGameState(createInitialState(words)));
   }, []);
 
-  const currentWord = words[currentIndex];
-  const isCorrect = selectedAnswer === currentWord?.article;
-  const isLastWord = currentIndex === words.length - 1;
+  const handleAnswer = (article: Article) =>
+    setGameState(submitAnswer(article));
 
-  const handleAnswer = (article: Article) => {
-    if (selectedAnswer) return;
-    setSelectedAnswer(article);
-  };
+  const handleNext = () => setGameState(nextWord);
 
-  const handleNext = () => {
-    setSelectedAnswer(null);
-    setCurrentIndex((prev) => prev + 1);
-  };
-
-  const getButtonClass = (article: Article) => {
+  const getButtonClass = (buttonState: ButtonState, article: Article) => {
     const baseClass =
       'cursor-pointer transition-all rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg relative';
     const colors = {
@@ -42,31 +42,25 @@ export function DerDieDas() {
       das: 'bg-green-500',
     };
 
-    if (!selectedAnswer) {
-      return `${baseClass} ${colors[article]}`;
+    switch (buttonState) {
+      case 'default':
+        return `${baseClass} ${colors[article]}`;
+      case 'correct':
+        return `${baseClass} ${colorsStatic[article]} ring-4 ring-white scale-105`;
+      case 'incorrect':
+        return `${baseClass} ${colorsStatic[article]} opacity-50`;
+      case 'dimmed':
+        return `${baseClass} ${colorsStatic[article]} opacity-30`;
     }
-
-    if (article === currentWord?.article) {
-      return `${baseClass} ${colorsStatic[article]} ring-4 ring-white scale-105`;
-    }
-
-    if (article === selectedAnswer && !isCorrect) {
-      return `${baseClass} ${colorsStatic[article]} opacity-50`;
-    }
-
-    return `${baseClass} ${colorsStatic[article]} opacity-30`;
   };
 
-  const renderButtonContent = (article: Article, label: string) => {
-    const isThisCorrect = article === currentWord?.article;
-    const isThisSelected = article === selectedAnswer;
-
+  const renderButtonContent = (buttonState: ButtonState, label: string) => {
     return (
       <>
         <p className="text-lg sm:text-xl md:text-2xl font-bold text-white text-center">
           {label}
         </p>
-        {selectedAnswer && isThisCorrect && (
+        {buttonState === 'correct' && (
           <span className="absolute -top-2 -right-2 bg-white rounded-full p-1">
             <svg
               className="w-4 h-4 text-emerald-500"
@@ -83,7 +77,7 @@ export function DerDieDas() {
             </svg>
           </span>
         )}
-        {selectedAnswer && isThisSelected && !isThisCorrect && (
+        {buttonState === 'incorrect' && (
           <span className="absolute -top-2 -right-2 bg-white rounded-full p-1">
             <svg
               className="w-4 h-4 text-red-500"
@@ -104,13 +98,18 @@ export function DerDieDas() {
     );
   };
 
-  if (!currentWord) {
+  const currentWord = getCurrentWord(gameState);
+
+  if (!currentWord || !gameState) {
     return (
       <PageLayout>
         <p className="text-white">Loading...</p>
       </PageLayout>
     );
   }
+
+  const answered = hasAnswered(gameState);
+  const lastWord = isLastWord(gameState);
 
   return (
     <PageLayout>
@@ -142,7 +141,7 @@ export function DerDieDas() {
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <div className="w-full relative bg-slate-800 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl">
           <span className="absolute top-3 right-4 sm:top-4 sm:right-5 text-slate-400 text-sm sm:text-base font-medium">
-            {currentIndex + 1} / {words.length}
+            {gameState.currentIndex + 1} / {gameState.words.length}
           </span>
           <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center">
             {currentWord.word}
@@ -150,36 +149,31 @@ export function DerDieDas() {
         </div>
 
         <div className="w-full grid grid-cols-3 gap-3 sm:gap-4">
-          <button
-            onClick={() => handleAnswer('der')}
-            disabled={!!selectedAnswer}
-            className={getButtonClass('der')}
-          >
-            {renderButtonContent('der', 'Der')}
-          </button>
-          <button
-            onClick={() => handleAnswer('die')}
-            disabled={!!selectedAnswer}
-            className={getButtonClass('die')}
-          >
-            {renderButtonContent('die', 'Die')}
-          </button>
-          <button
-            onClick={() => handleAnswer('das')}
-            disabled={!!selectedAnswer}
-            className={getButtonClass('das')}
-          >
-            {renderButtonContent('das', 'Das')}
-          </button>
+          {(['der', 'die', 'das'] as const).map((article) => {
+            const buttonState = getButtonState(gameState, article);
+            return (
+              <button
+                key={article}
+                onClick={() => handleAnswer(article)}
+                disabled={answered}
+                className={getButtonClass(buttonState, article)}
+              >
+                {renderButtonContent(
+                  buttonState,
+                  article.charAt(0).toUpperCase() + article.slice(1)
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {selectedAnswer && (
+        {answered && (
           <button
-            onClick={isLastWord ? () => navigate('/') : handleNext}
+            onClick={lastWord ? () => navigate('/') : handleNext}
             className="cursor-pointer flex items-center gap-2 text-slate-400 hover:text-white transition-colors py-2"
           >
             <span className="text-base sm:text-lg">
-              {isLastWord ? 'Fertig' : 'Weiter'}
+              {lastWord ? 'Fertig' : 'Weiter'}
             </span>
             <svg
               className="w-4 h-4 sm:w-5 sm:h-5"
