@@ -1,4 +1,4 @@
-import type { Word, Article } from './wordService';
+import type { Word, Article } from './words.ts';
 
 export interface GameState {
   words: Word[];

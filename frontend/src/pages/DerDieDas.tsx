@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { DerDieDasIcon } from '../components/DerDieDasIcon';
+import { DerDieDasIcon } from '../games/DerDieDas/components/DerDieDasIcon.tsx';
 import { PageLayout } from '../components/PageLayout';
-import { getWords, type Article } from '../services/wordService';
+import { getWords, type Article } from '../games/DerDieDas/domain/words.ts';
 import {
   type GameState,
   type ButtonState,
@@ -13,7 +13,7 @@ import {
   submitAnswer,
   nextWord,
   getButtonState,
-} from '../services/derDieDasGame';
+} from '../games/DerDieDas/domain/state.ts';
 
 export function DerDieDas() {
   const [gameState, setGameState] = useState<GameState | null>(null);
