@@ -20,6 +20,7 @@ import {
   isAnswerCorrect,
   isAnswerIncorrect,
 } from '../games/DerDieDas/domain/state.ts';
+import { GameLayout } from '../components/GameLayout.tsx';
 
 const WORDS_TO_PLAY = 10;
 
@@ -48,23 +49,23 @@ export function DerDieDas() {
 
   if (!gameState) {
     return (
-      <PageLayout>
+      <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
         <p className="text-white">Loading...</p>
-      </PageLayout>
+      </GameLayout>
     );
   }
 
   if (gameState.isFinished) {
     const score = getScore(gameState);
     return (
-      <PageLayout>
+      <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
         <GameResult
           correct={score.correct}
           total={score.total}
           onPlayAgain={startGame}
           onGoHome={() => navigate('/')}
         />
-      </PageLayout>
+      </GameLayout>
     );
   }
 
@@ -80,32 +81,7 @@ export function DerDieDas() {
   const lastWord = isLastWord(gameState);
 
   return (
-    <PageLayout>
-      <header className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 flex items-center gap-2 sm:gap-3">
-        <button
-          onClick={() => navigate('/')}
-          className="cursor-pointer text-slate-400 hover:text-white transition-colors p-1"
-        >
-          <svg
-            className="w-5 h-5 sm:w-6 sm:h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <DerDieDasIcon />
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
-          Der Die Das
-        </h1>
-      </header>
-
+    <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <WordPanel
           word={currentWord.word}
@@ -151,6 +127,6 @@ export function DerDieDas() {
           </button>
         )}
       </div>
-    </PageLayout>
+    </GameLayout>
   );
 }
