@@ -21,6 +21,7 @@ import {
   isAnswerIncorrect,
 } from '../games/DerDieDas/domain/state.ts';
 import { GameLayout } from '../components/GameLayout.tsx';
+import { Loader } from '../components/Loader.tsx';
 
 const WORDS_TO_PLAY = 10;
 
@@ -50,7 +51,7 @@ export function DerDieDas() {
   if (!gameState) {
     return (
       <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
-        <p className="text-white">Loading...</p>
+        <Loader />
       </GameLayout>
     );
   }
@@ -72,7 +73,7 @@ export function DerDieDas() {
   if (!currentWord) {
     return (
       <PageLayout>
-        <p className="text-white">Loading...</p>
+        <Loader />
       </PageLayout>
     );
   }
