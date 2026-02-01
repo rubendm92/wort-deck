@@ -21,12 +21,16 @@ import {
   isAnswerIncorrect,
 } from '../games/DerDieDas/domain/state.ts';
 
+const WORDS_TO_PLAY = 10;
+
 export function DerDieDas() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const navigate = useNavigate();
 
   const startGame = useCallback(() => {
-    getWords(10).then((words) => setGameState(createInitialState(words)));
+    getWords(WORDS_TO_PLAY).then((words) =>
+      setGameState(createInitialState(words))
+    );
   }, []);
 
   useEffect(() => {
