@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DerDieDasIcon } from '../games/DerDieDas/components/DerDieDasIcon.tsx';
 import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
+import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import { PageLayout } from '../components/PageLayout';
 import { getWords, type Article } from '../games/DerDieDas/domain/words.ts';
 import {
@@ -13,6 +14,8 @@ import {
   hasAnswered,
   submitAnswer,
   nextWord,
+  finishGame,
+  getScore,
   getButtonState,
   isAnswerCorrect,
   isAnswerIncorrect,
@@ -22,18 +25,46 @@ export function DerDieDas() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const startGame = useCallback(() => {
     getWords(10).then((words) => setGameState(createInitialState(words)));
   }, []);
+
+  useEffect(() => {
+    startGame();
+  }, [startGame]);
 
   const handleAnswer = (article: Article) =>
     setGameState(submitAnswer(article));
 
   const handleNext = () => setGameState(nextWord);
 
+  const handleFinish = () => setGameState(finishGame);
+
   const currentWord = getCurrentWord(gameState);
 
-  if (!currentWord || !gameState) {
+  if (!gameState) {
+    return (
+      <PageLayout>
+        <p className="text-white">Loading...</p>
+      </PageLayout>
+    );
+  }
+
+  if (gameState.isFinished) {
+    const score = getScore(gameState);
+    return (
+      <PageLayout>
+        <GameResult
+          correct={score.correct}
+          total={score.total}
+          onPlayAgain={startGame}
+          onGoHome={() => navigate('/')}
+        />
+      </PageLayout>
+    );
+  }
+
+  if (!currentWord) {
     return (
       <PageLayout>
         <p className="text-white">Loading...</p>
@@ -94,7 +125,7 @@ export function DerDieDas() {
 
         {answered && (
           <button
-            onClick={lastWord ? () => navigate('/') : handleNext}
+            onClick={lastWord ? handleFinish : handleNext}
             className="cursor-pointer flex items-center gap-2 text-slate-400 hover:text-white transition-colors py-2"
           >
             <span className="text-base sm:text-lg">

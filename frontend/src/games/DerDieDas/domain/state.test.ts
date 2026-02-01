@@ -6,6 +6,8 @@ import {
   hasAnswered,
   submitAnswer,
   nextWord,
+  finishGame,
+  getScore,
   getButtonState,
   isAnswerCorrect,
   isAnswerIncorrect,
@@ -26,6 +28,8 @@ describe('createInitialState', () => {
     expect(state.words).toBe(testWords);
     expect(state.currentIndex).toBe(0);
     expect(state.selectedAnswer).toBeNull();
+    expect(state.correctCount).toBe(0);
+    expect(state.isFinished).toBe(false);
   });
 });
 
@@ -50,6 +54,8 @@ describe('getCurrentWord', () => {
       words: testWords,
       currentIndex: 1,
       selectedAnswer: null,
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(getCurrentWord(state)).toEqual({
@@ -77,6 +83,8 @@ describe('isLastWord', () => {
       words: testWords,
       currentIndex: 2,
       selectedAnswer: null,
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(isLastWord(state)).toBe(true);
@@ -99,6 +107,8 @@ describe('hasAnswered', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
 
     expect(hasAnswered(state)).toBe(true);
@@ -124,6 +134,8 @@ describe('submitAnswer', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
     const result = submitAnswer('die')(state);
 
@@ -135,6 +147,8 @@ describe('submitAnswer', () => {
       words: testWords,
       currentIndex: 1,
       selectedAnswer: null,
+      correctCount: 0,
+      isFinished: false,
     };
     const result = submitAnswer('das')(state);
 
@@ -160,6 +174,8 @@ describe('nextWord', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
     const result = nextWord(state);
 
@@ -185,6 +201,8 @@ describe('getButtonState', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
 
     expect(getButtonState(state, 'der')).toBe('correct');
@@ -195,6 +213,8 @@ describe('getButtonState', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(getButtonState(state, 'die')).toBe('incorrect');
@@ -205,6 +225,8 @@ describe('getButtonState', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(getButtonState(state, 'das')).toBe('dimmed');
@@ -215,6 +237,8 @@ describe('getButtonState', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(getButtonState(state, 'der')).toBe('correct');
@@ -237,6 +261,8 @@ describe('isAnswerCorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
 
     expect(isAnswerCorrect(state, 'der')).toBe(true);
@@ -247,6 +273,8 @@ describe('isAnswerCorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(isAnswerCorrect(state, 'der')).toBe(true);
@@ -257,6 +285,8 @@ describe('isAnswerCorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
 
     expect(isAnswerCorrect(state, 'die')).toBe(false);
@@ -280,6 +310,8 @@ describe('isAnswerIncorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(isAnswerIncorrect(state, 'die')).toBe(true);
@@ -290,6 +322,8 @@ describe('isAnswerIncorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'der',
+      correctCount: 1,
+      isFinished: false,
     };
 
     expect(isAnswerIncorrect(state, 'der')).toBe(false);
@@ -300,8 +334,71 @@ describe('isAnswerIncorrect', () => {
       words: testWords,
       currentIndex: 0,
       selectedAnswer: 'die',
+      correctCount: 0,
+      isFinished: false,
     };
 
     expect(isAnswerIncorrect(state, 'das')).toBe(false);
+  });
+});
+
+describe('submitAnswer correctCount', () => {
+  it('increments correctCount when answer is correct', () => {
+    const state = createInitialState(testWords);
+    const result = submitAnswer('der')(state);
+
+    expect(result?.correctCount).toBe(1);
+  });
+
+  it('does not increment correctCount when answer is wrong', () => {
+    const state = createInitialState(testWords);
+    const result = submitAnswer('die')(state);
+
+    expect(result?.correctCount).toBe(0);
+  });
+});
+
+describe('finishGame', () => {
+  it('returns null for null state', () => {
+    expect(finishGame(null)).toBeNull();
+  });
+
+  it('sets isFinished to true', () => {
+    const state = createInitialState(testWords);
+    const result = finishGame(state);
+
+    expect(result?.isFinished).toBe(true);
+  });
+
+  it('preserves other state properties', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 2,
+      selectedAnswer: 'das',
+      correctCount: 2,
+      isFinished: false,
+    };
+    const result = finishGame(state);
+
+    expect(result?.currentIndex).toBe(2);
+    expect(result?.correctCount).toBe(2);
+  });
+});
+
+describe('getScore', () => {
+  it('returns zeros for null state', () => {
+    expect(getScore(null)).toEqual({ correct: 0, total: 0 });
+  });
+
+  it('returns correct count and total words', () => {
+    const state: GameState = {
+      words: testWords,
+      currentIndex: 2,
+      selectedAnswer: 'das',
+      correctCount: 2,
+      isFinished: true,
+    };
+
+    expect(getScore(state)).toEqual({ correct: 2, total: 3 });
   });
 });
