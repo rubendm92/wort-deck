@@ -47,6 +47,6 @@ function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export async function getWords(): Promise<Word[]> {
-  return shuffle(words);
+export async function getWords(count: number): Promise<Word[]> {
+  return shuffle(words).slice(0, count);
 }

@@ -23,7 +23,7 @@ export function DerDieDas() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getWords().then((words) => setGameState(createInitialState(words)));
+    getWords(10).then((words) => setGameState(createInitialState(words)));
   }, []);
 
   const handleAnswer = (article: Article) =>
