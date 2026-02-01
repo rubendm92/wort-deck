@@ -1,19 +1,31 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { DieVieleIcon } from '../games/DieViele/components/DieVieleIcon.tsx';
 import { GameLayout } from '../components/GameLayout.tsx';
 import { getWords } from '../games/DerDieDas/domain/words.ts';
 import { Loader } from '../components/Loader.tsx';
+import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import {
   type GameState,
   createInitialState,
   getCurrentWord,
   updateAnswer,
+  submitAnswer,
+  nextWord,
+  finishGame,
+  isLastWord,
+  hasSubmitted,
+  isAnswerCorrect,
+  getScore,
 } from '../games/DieViele/domain/state.ts';
 
 const WORDS_TO_PLAY = 10;
 
+const GAME_NAME = 'Die Viele';
+
 export function DieViele() {
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const navigate = useNavigate();
 
   const startGame = useCallback(() => {
     getWords(WORDS_TO_PLAY).then((words) =>
@@ -21,15 +33,35 @@ export function DieViele() {
     );
   }, []);
 
-  useEffect(() => {
-    startGame();
-  }, [startGame]);
+  useEffect(startGame, [startGame]);
 
   const currentWord = getCurrentWord(gameState);
 
-  if (!gameState || !currentWord) {
+  if (!gameState) {
     return (
-      <GameLayout icon={<DieVieleIcon />} name="Die Viele">
+      <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
+        <Loader />
+      </GameLayout>
+    );
+  }
+
+  if (gameState.isFinished) {
+    const score = getScore(gameState);
+    return (
+      <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
+        <GameResult
+          correct={score.correct}
+          total={score.total}
+          onPlayAgain={startGame}
+          onGoHome={() => navigate('/')}
+        />
+      </GameLayout>
+    );
+  }
+
+  if (!currentWord) {
+    return (
+      <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
         <Loader />
       </GameLayout>
     );
@@ -38,8 +70,18 @@ export function DieViele() {
   const handleAnswerChange = (value: string) =>
     setGameState(updateAnswer(value));
 
+  const handleSubmit = () => setGameState(submitAnswer);
+
+  const handleNext = () => setGameState(nextWord);
+
+  const handleFinish = () => setGameState(finishGame);
+
+  const submitted = hasSubmitted(gameState);
+  const correct = isAnswerCorrect(gameState);
+  const lastWord = isLastWord(gameState);
+
   return (
-    <GameLayout icon={<DieVieleIcon />} name="Die Viele">
+    <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <div className="w-full relative bg-slate-800 rounded-2xl sm:rounded-3xl p-8 sm:p-12 md:p-16 shadow-xl">
           <span className="absolute top-3 right-4 sm:top-4 sm:right-5 text-slate-400 text-sm sm:text-base font-medium">
@@ -62,9 +104,68 @@ export function DieViele() {
             type="text"
             value={gameState.answer}
             onChange={(e) => handleAnswerChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !submitted) handleSubmit();
+            }}
             placeholder="die ..."
-            className="w-full max-w-xs sm:max-w-sm bg-slate-700 text-white text-xl sm:text-2xl text-center py-4 px-6 rounded-xl border-2 border-slate-600 focus:border-blue-500 focus:outline-none transition-colors placeholder-slate-500"
+            disabled={submitted}
+            className={`w-full max-w-xs sm:max-w-sm text-white text-xl sm:text-2xl text-center py-4 px-6 rounded-xl border-2 focus:outline-none transition-colors placeholder-slate-500 ${
+              submitted
+                ? correct
+                  ? 'bg-emerald-900/50 border-emerald-500'
+                  : 'bg-red-900/50 border-red-500'
+                : 'bg-slate-700 border-slate-600 focus:border-blue-500'
+            }`}
           />
+
+          {!submitted && (
+            <button
+              onClick={handleSubmit}
+              disabled={!gameState.answer.trim()}
+              className="cursor-pointer bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl transition-colors"
+            >
+              Prüfen
+            </button>
+          )}
+
+          {submitted && (
+            <div className="flex flex-col items-center gap-4">
+              {correct ? (
+                <p className="text-emerald-400 text-lg sm:text-xl font-medium">
+                  Richtig!
+                </p>
+              ) : (
+                <p className="text-red-400 text-lg sm:text-xl font-medium">
+                  Falsch! Die richtige Antwort ist:{' '}
+                  <span className="text-white font-bold">
+                    {currentWord.plural}
+                  </span>
+                </p>
+              )}
+
+              <button
+                onClick={lastWord ? handleFinish : handleNext}
+                className="cursor-pointer flex items-center gap-2 text-slate-400 hover:text-white transition-colors py-2"
+              >
+                <span className="text-base sm:text-lg">
+                  {lastWord ? 'Fertig' : 'Weiter'}
+                </span>
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </GameLayout>

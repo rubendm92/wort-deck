@@ -35,9 +35,7 @@ export function DerDieDas() {
     );
   }, []);
 
-  useEffect(() => {
-    startGame();
-  }, [startGame]);
+  useEffect(startGame, [startGame]);
 
   const handleAnswer = (article: Article) =>
     setGameState(submitAnswer(article));
