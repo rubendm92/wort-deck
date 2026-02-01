@@ -13,25 +13,30 @@ const words: Word[] = [
   { word: 'Landkarte', article: 'die', plural: 'Landkarten', tags: [] },
   { word: 'Tür', article: 'die', plural: 'Türen', tags: [] },
   { word: 'Tor', article: 'das', plural: 'Tore', tags: [] },
-  { word: 'Torte', article: 'die', plural: 'Torten', tags: [] },
+  { word: 'Torte', article: 'die', plural: 'Torten', tags: ['Lebensmittel'] },
   { word: 'Stadion', article: 'das', plural: 'Stadien', tags: [] },
   { word: 'Nummer', article: 'die', plural: 'Nummern', tags: [] },
   { word: 'Zahl', article: 'die', plural: 'Zahlen', tags: [] },
   { word: 'Handynummer', article: 'die', plural: 'Handynummern', tags: [] },
   { word: 'Bürgermeister', article: 'der', plural: 'Bürgermeister', tags: [] },
-  { word: 'Bierfass', article: 'das', plural: 'Bierfässer', tags: [] },
+  {
+    word: 'Bierfass',
+    article: 'das',
+    plural: 'Bierfässer',
+    tags: ['Lebensmittel'],
+  },
   { word: 'Buchstabe', article: 'der', plural: 'Buchstaben', tags: [] },
   { word: 'Hausaufgabe', article: 'die', plural: 'Hausaufgaben', tags: [] },
   { word: 'Name', article: 'der', plural: 'Namen', tags: [] },
   { word: 'Vorname', article: 'der', plural: 'Vornamen', tags: [] },
   { word: 'Familienname', article: 'der', plural: 'Familienname', tags: [] },
   { word: 'Nachname', article: 'der', plural: 'Nachnamen', tags: [] },
-  { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },
-  { word: 'Banane', article: 'die', plural: 'Bananen', tags: [] },
-  { word: 'Brot', article: 'das', plural: 'Brote', tags: [] },
-  { word: 'Kaffee', article: 'der', plural: 'Kaffees', tags: [] },
-  { word: 'Milch', article: 'die', plural: 'Milch', tags: [] },
-  { word: 'Wasser', article: 'das', plural: 'Wasser', tags: [] },
+  { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: ['Lebensmittel'] },
+  { word: 'Banane', article: 'die', plural: 'Bananen', tags: ['Lebensmittel'] },
+  { word: 'Brot', article: 'das', plural: 'Brote', tags: ['Lebensmittel'] },
+  { word: 'Kaffee', article: 'der', plural: 'Kaffees', tags: ['Lebensmittel'] },
+  { word: 'Milch', article: 'die', plural: 'Milch', tags: ['Lebensmittel'] },
+  { word: 'Wasser', article: 'das', plural: 'Wasser', tags: ['Lebensmittel'] },
   { word: 'Tisch', article: 'der', plural: 'Tische', tags: [] },
   { word: 'Lampe', article: 'die', plural: 'Lampen', tags: [] },
   { word: 'Buch', article: 'das', plural: 'Bücher', tags: [] },
@@ -54,67 +59,67 @@ const words: Word[] = [
   { word: 'Adresse', article: 'die', plural: 'Adressen', tags: [] },
   { word: 'Nachbar', article: 'der', plural: 'Nachbarn', tags: [] },
   { word: 'Nachbarin', article: 'die', plural: 'Nachbarinnen', tags: [] },
-  { word: 'Beruf', article: 'der', plural: 'Berufe', tags: ['beruf'] },
+  { word: 'Beruf', article: 'der', plural: 'Berufe', tags: ['Beruf'] },
   {
     word: 'Krankenpfleger',
     article: 'der',
     plural: 'Krankenpfleger',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
   {
     word: 'Krankenschwester',
     article: 'die',
     plural: 'Krankenschwestern',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
   {
     word: 'Pflegekraft',
     article: 'die',
     plural: 'Pflegekräfte',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
-  { word: 'Verkäufer', article: 'der', plural: 'Verkäufer', tags: ['beruf'] },
+  { word: 'Verkäufer', article: 'der', plural: 'Verkäufer', tags: ['Beruf'] },
   {
     word: 'Verkäuferin',
     article: 'die',
     plural: 'Verkäuferinnen',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
 
   {
     word: 'Informatiker',
     article: 'der',
     plural: 'Informatiker',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
   {
     word: 'Informatikerin',
     article: 'die',
     plural: 'Informatikerinnen',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
-  { word: 'Lehrer', article: 'der', plural: 'Lehrer', tags: ['beruf'] },
-  { word: 'Lehrerin', article: 'die', plural: 'Lehrerinnen', tags: ['beruf'] },
-  { word: 'Friseur', article: 'der', plural: 'Friseure', tags: ['beruf'] },
+  { word: 'Lehrer', article: 'der', plural: 'Lehrer', tags: ['Beruf'] },
+  { word: 'Lehrerin', article: 'die', plural: 'Lehrerinnen', tags: ['Beruf'] },
+  { word: 'Friseur', article: 'der', plural: 'Friseure', tags: ['Beruf'] },
   {
     word: 'Friseurin',
     article: 'die',
     plural: 'Friseurinnen',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
-  { word: 'Architekt', article: 'der', plural: 'Architekten', tags: ['beruf'] },
+  { word: 'Architekt', article: 'der', plural: 'Architekten', tags: ['Beruf'] },
   {
     word: 'Architektin',
     article: 'die',
     plural: 'Architektinnen',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
-  { word: 'Ingenieur', article: 'der', plural: 'Ingenieure', tags: ['beruf'] },
+  { word: 'Ingenieur', article: 'der', plural: 'Ingenieure', tags: ['Beruf'] },
   {
     word: 'Ingenieurin',
     article: 'die',
     plural: 'Ingenieurinnen',
-    tags: ['beruf'],
+    tags: ['Beruf'],
   },
   { word: 'Hobby', article: 'das', plural: 'Hobbys', tags: [] },
   { word: 'Woche', article: 'die', plural: 'Wochen', tags: [] },
@@ -155,6 +160,31 @@ function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export async function getWords(count: number): Promise<Word[]> {
-  return shuffle(words).slice(0, count);
+export function getTags(): string[] {
+  const tagSet = new Set<string>();
+  for (const word of words) {
+    for (const tag of word.tags) {
+      tagSet.add(tag);
+    }
+  }
+  return Array.from(tagSet).sort();
+}
+
+export interface GetWordsOptions {
+  count: number;
+  tags?: string[];
+}
+
+export async function getWords(options: GetWordsOptions): Promise<Word[]> {
+  const { count, tags } = options;
+  let filtered = words;
+
+  if (tags && tags.length > 0) {
+    filtered = words.filter(
+      (word) =>
+        word.tags.length === 0 || word.tags.some((tag) => tags.includes(tag))
+    );
+  }
+
+  return shuffle(filtered).slice(0, count);
 }

@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DerDieDasIcon } from '../games/DerDieDas/components/DerDieDasIcon.tsx';
 import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
-import { PageLayout } from '../components/PageLayout';
-import { getWords, type Article } from '../games/DerDieDas/domain/words.ts';
+import { GameSetup } from '../components/GameSetup.tsx';
+import {
+  getWords,
+  getTags,
+  type Article,
+} from '../games/DerDieDas/domain/words.ts';
 import {
   type GameState,
   createInitialState,
@@ -21,21 +25,24 @@ import {
   isAnswerIncorrect,
 } from '../games/DerDieDas/domain/state.ts';
 import { GameLayout } from '../components/GameLayout.tsx';
-import { Loader } from '../components/Loader.tsx';
 
-const WORDS_TO_PLAY = 10;
+const DEFAULT_WORD_COUNT = 10;
+
+const GAME_NAME = 'Der Die Das';
 
 export function DerDieDas() {
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [wordCount, setWordCount] = useState(DEFAULT_WORD_COUNT);
+  const [selectedTags, setSelectedTags] = useState<string[]>(() => getTags());
   const navigate = useNavigate();
 
+  const availableTags = useMemo(() => getTags(), []);
+
   const startGame = useCallback(() => {
-    getWords(WORDS_TO_PLAY).then((words) =>
+    getWords({ count: wordCount, tags: selectedTags }).then((words) =>
       setGameState(createInitialState(words))
     );
-  }, []);
-
-  useEffect(startGame, [startGame]);
+  }, [wordCount, selectedTags]);
 
   const handleAnswer = (article: Article) =>
     setGameState(submitAnswer(article));
@@ -48,8 +55,21 @@ export function DerDieDas() {
 
   if (!gameState) {
     return (
-      <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
-        <Loader />
+      <GameLayout icon={<DerDieDasIcon />} name={GAME_NAME}>
+        <GameSetup
+          wordCount={wordCount}
+          onWordCountChange={setWordCount}
+          selectedTags={selectedTags}
+          availableTags={availableTags}
+          onTagToggle={(tag) =>
+            setSelectedTags((prev) =>
+              prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+            )
+          }
+          onSelectAllTags={() => setSelectedTags(availableTags)}
+          onDeselectAllTags={() => setSelectedTags([])}
+          onStartGame={startGame}
+        />
       </GameLayout>
     );
   }
@@ -57,11 +77,11 @@ export function DerDieDas() {
   if (gameState.isFinished) {
     const score = getScore(gameState);
     return (
-      <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
+      <GameLayout icon={<DerDieDasIcon />} name={GAME_NAME}>
         <GameResult
           correct={score.correct}
           total={score.total}
-          onPlayAgain={startGame}
+          onPlayAgain={() => setGameState(null)}
           onGoHome={() => navigate('/')}
         />
       </GameLayout>
@@ -69,18 +89,14 @@ export function DerDieDas() {
   }
 
   if (!currentWord) {
-    return (
-      <PageLayout>
-        <Loader />
-      </PageLayout>
-    );
+    return null;
   }
 
   const answered = hasAnswered(gameState);
   const lastWord = isLastWord(gameState);
 
   return (
-    <GameLayout icon={<DerDieDasIcon />} name="Der Die Das">
+    <GameLayout icon={<DerDieDasIcon />} name={GAME_NAME}>
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <WordPanel
           word={currentWord.word}

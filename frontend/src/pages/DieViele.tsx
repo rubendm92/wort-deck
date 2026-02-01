@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DieVieleIcon } from '../games/DieViele/components/DieVieleIcon.tsx';
 import { GameLayout } from '../components/GameLayout.tsx';
-import { getWords } from '../games/DerDieDas/domain/words.ts';
-import { Loader } from '../components/Loader.tsx';
+import { GameSetup } from '../components/GameSetup.tsx';
+import { getWords, getTags } from '../games/DerDieDas/domain/words.ts';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import {
   type GameState,
@@ -19,28 +19,43 @@ import {
   getScore,
 } from '../games/DieViele/domain/state.ts';
 
-const WORDS_TO_PLAY = 10;
+const DEFAULT_WORD_COUNT = 10;
 
 const GAME_NAME = 'Die Viele';
 
 export function DieViele() {
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [wordCount, setWordCount] = useState(DEFAULT_WORD_COUNT);
+  const [selectedTags, setSelectedTags] = useState<string[]>(() => getTags());
   const navigate = useNavigate();
 
+  const availableTags = useMemo(() => getTags(), []);
+
   const startGame = useCallback(() => {
-    getWords(WORDS_TO_PLAY).then((words) =>
+    getWords({ count: wordCount, tags: selectedTags }).then((words) =>
       setGameState(createInitialState(words))
     );
-  }, []);
-
-  useEffect(startGame, [startGame]);
+  }, [wordCount, selectedTags]);
 
   const currentWord = getCurrentWord(gameState);
 
   if (!gameState) {
     return (
       <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
-        <Loader />
+        <GameSetup
+          wordCount={wordCount}
+          onWordCountChange={setWordCount}
+          selectedTags={selectedTags}
+          availableTags={availableTags}
+          onTagToggle={(tag) =>
+            setSelectedTags((prev) =>
+              prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+            )
+          }
+          onSelectAllTags={() => setSelectedTags(availableTags)}
+          onDeselectAllTags={() => setSelectedTags([])}
+          onStartGame={startGame}
+        />
       </GameLayout>
     );
   }
@@ -52,7 +67,7 @@ export function DieViele() {
         <GameResult
           correct={score.correct}
           total={score.total}
-          onPlayAgain={startGame}
+          onPlayAgain={() => setGameState(null)}
           onGoHome={() => navigate('/')}
         />
       </GameLayout>
@@ -60,11 +75,7 @@ export function DieViele() {
   }
 
   if (!currentWord) {
-    return (
-      <GameLayout icon={<DieVieleIcon />} name={GAME_NAME}>
-        <Loader />
-      </GameLayout>
-    );
+    return null;
   }
 
   const handleAnswerChange = (value: string) =>
