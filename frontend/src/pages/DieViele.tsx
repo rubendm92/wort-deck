@@ -112,24 +112,30 @@ export function DieViele() {
           >
             Wie ist der Plural?
           </label>
-          <input
-            id="plural-input"
-            type="text"
-            value={gameState.answer}
-            onChange={(e) => handleAnswerChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !submitted) handleSubmit();
-            }}
-            placeholder="die ..."
-            disabled={submitted}
-            className={`w-full max-w-xs sm:max-w-sm text-white text-xl sm:text-2xl text-center py-4 px-6 rounded-xl border-2 focus:outline-none transition-colors placeholder-slate-500 ${
+          <div
+            className={`flex items-center w-full max-w-xs sm:max-w-sm rounded-xl border-2 transition-colors ${
               submitted
                 ? correct
                   ? 'bg-emerald-900/50 border-emerald-500'
                   : 'bg-red-900/50 border-red-500'
-                : 'bg-slate-700 border-slate-600 focus:border-blue-500'
+                : 'bg-slate-700 border-slate-600 focus-within:border-blue-500'
             }`}
-          />
+          >
+            <span className="text-slate-400 text-xl sm:text-2xl pl-5 select-none">
+              die
+            </span>
+            <input
+              id="plural-input"
+              type="text"
+              value={gameState.answer}
+              onChange={(e) => handleAnswerChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !submitted) handleSubmit();
+              }}
+              disabled={submitted}
+              className="flex-1 bg-transparent text-white text-xl sm:text-2xl py-4 px-3 focus:outline-none"
+            />
+          </div>
 
           {!submitted && (
             <button
@@ -151,7 +157,7 @@ export function DieViele() {
                 <p className="text-red-400 text-lg sm:text-xl font-medium">
                   Falsch! Die richtige Antwort ist:{' '}
                   <span className="text-white font-bold">
-                    {currentWord.plural}
+                    die {currentWord.plural}
                   </span>
                 </p>
               )}
