@@ -14,9 +14,9 @@ import {
 import type { Word } from './words';
 
 const testWords: Word[] = [
-  { word: 'Apfel', article: 'der' },
-  { word: 'Banane', article: 'die' },
-  { word: 'Brot', article: 'das' },
+  { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },
+  { word: 'Banane', article: 'die', plural: 'Bananen', tags: [] },
+  { word: 'Brot', article: 'das', plural: 'Brote', tags: [] },
 ];
 
 describe('createInitialState', () => {
@@ -37,7 +37,12 @@ describe('getCurrentWord', () => {
   it('returns the word at current index', () => {
     const state = createInitialState(testWords);
 
-    expect(getCurrentWord(state)).toEqual({ word: 'Apfel', article: 'der' });
+    expect(getCurrentWord(state)).toEqual({
+      word: 'Apfel',
+      article: 'der',
+      plural: 'Äpfel',
+      tags: [],
+    });
   });
 
   it('returns the word at updated index', () => {
@@ -47,7 +52,12 @@ describe('getCurrentWord', () => {
       selectedAnswer: null,
     };
 
-    expect(getCurrentWord(state)).toEqual({ word: 'Banane', article: 'die' });
+    expect(getCurrentWord(state)).toEqual({
+      word: 'Banane',
+      article: 'die',
+      plural: 'Bananen',
+      tags: [],
+    });
   });
 });
 
