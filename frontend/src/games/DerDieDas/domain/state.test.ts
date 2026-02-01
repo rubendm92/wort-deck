@@ -13,7 +13,7 @@ import {
   isAnswerIncorrect,
   type GameState,
 } from './state';
-import type { Word } from './words';
+import type { Word } from '../../domain/words.ts';
 
 const testWords: Word[] = [
   { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },

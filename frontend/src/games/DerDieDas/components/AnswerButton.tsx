@@ -1,4 +1,4 @@
-import type { Article } from '../domain/words.ts';
+import type { Article } from '../../domain/words.ts';
 import type { ButtonState } from '../domain/state.ts';
 
 interface AnswerButtonProps {

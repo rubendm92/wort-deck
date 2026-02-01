@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { DieVieleIcon } from '../games/DieViele/components/DieVieleIcon.tsx';
 import { GameLayout } from '../components/GameLayout.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { getWords, getTags } from '../games/DerDieDas/domain/words.ts';
+import { getWords, getTags } from '../games/domain/words.ts';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import {
   type GameState,
@@ -49,7 +49,9 @@ export function DieViele() {
           availableTags={availableTags}
           onTagToggle={(tag) =>
             setSelectedTags((prev) =>
-              prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+              prev.includes(tag)
+                ? prev.filter((t) => t !== tag)
+                : [...prev, tag]
             )
           }
           onSelectAllTags={() => setSelectedTags(availableTags)}

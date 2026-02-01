@@ -12,7 +12,7 @@ import {
   getScore,
   type GameState,
 } from './state';
-import type { Word } from '../../DerDieDas/domain/words';
+import type { Word } from '../../domain/words.ts';
 
 const testWords: Word[] = [
   { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },

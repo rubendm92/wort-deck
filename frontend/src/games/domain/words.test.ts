@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getWords, getTags } from './words';
+import { getWords, getTags } from './words.ts';
 
 describe('getTags', () => {
   it('returns an array of unique tags', () => {

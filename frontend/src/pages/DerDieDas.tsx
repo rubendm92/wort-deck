@@ -5,11 +5,7 @@ import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import {
-  getWords,
-  getTags,
-  type Article,
-} from '../games/DerDieDas/domain/words.ts';
+import { getWords, getTags, type Article } from '../games/domain/words.ts';
 import {
   type GameState,
   createInitialState,
@@ -63,7 +59,9 @@ export function DerDieDas() {
           availableTags={availableTags}
           onTagToggle={(tag) =>
             setSelectedTags((prev) =>
-              prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+              prev.includes(tag)
+                ? prev.filter((t) => t !== tag)
+                : [...prev, tag]
             )
           }
           onSelectAllTags={() => setSelectedTags(availableTags)}

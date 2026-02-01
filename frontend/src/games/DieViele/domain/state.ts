@@ -1,4 +1,4 @@
-import type { Word } from '../../DerDieDas/domain/words.ts';
+import type { Word } from '../../domain/words.ts';
 
 export interface GameState {
   words: Word[];
@@ -44,7 +44,8 @@ export function submitAnswer(state: GameState | null): GameState | null {
   if (!state || state.submittedAnswer !== null) return state;
   const currentWord = getCurrentWord(state);
   const isCorrect =
-    normalizeAnswer(state.answer) === normalizeAnswer(currentWord?.plural ?? '');
+    normalizeAnswer(state.answer) ===
+    normalizeAnswer(currentWord?.plural ?? '');
   return {
     ...state,
     submittedAnswer: state.answer,
@@ -76,7 +77,9 @@ export function isLastWord(state: GameState | null): boolean {
 }
 
 export function hasSubmitted(state: GameState | null): boolean {
-  return state?.submittedAnswer !== null && state?.submittedAnswer !== undefined;
+  return (
+    state?.submittedAnswer !== null && state?.submittedAnswer !== undefined
+  );
 }
 
 export function isAnswerCorrect(state: GameState | null): boolean {
