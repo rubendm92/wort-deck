@@ -7,7 +7,7 @@ export interface Word {
   tags: string[];
 }
 
-const words: Word[] = [
+export const words: Word[] = [
   {
     word: 'Aktivität',
     article: 'die',
