@@ -1,6 +1,6 @@
 export async function loadAllWords() {
   try {
-    const response = await fetch('/api/words');
+    const response = await fetch('/api/nouns/all');
     if (!response.ok) {
       throw new Error('Failed to fetch words');
     }
