@@ -97,7 +97,7 @@ export function DerDieDas() {
     <GameLayout icon={<DerDieDasIcon />} name={GAME_NAME}>
       <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex flex-col items-center gap-6 sm:gap-8">
         <WordPanel
-          word={currentWord.word}
+          word={currentWord.singular}
           currentIndex={gameState.currentIndex}
           totalWords={gameState.words.length}
         />

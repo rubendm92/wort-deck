@@ -39,8 +39,8 @@ describe('getWords', () => {
 
     const allSame = results.every(
       (words) =>
-        JSON.stringify(words.map((w) => w.word)) ===
-        JSON.stringify(results[0].map((w) => w.word))
+        JSON.stringify(words.map((w) => w.singular)) ===
+        JSON.stringify(results[0].map((w) => w.singular))
     );
 
     expect(allSame).toBe(false);

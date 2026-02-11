@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
-import { type Word, type Article } from '../games/domain/words';
+import { type Noun, type Article } from '../games/domain/words';
 import { loadAllWords } from '../games/infrastructure/loadAllWords.ts';
 
 export function Words() {
   const navigate = useNavigate();
-  const [wordsList, setWordsList] = useState<Word[]>([]);
+  const [wordsList, setWordsList] = useState<Noun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export function Words() {
       .finally(() => setLoading(false));
   }, []);
 
-  const updateWord = (index: number, updates: Partial<Word>) => {
+  const updateWord = (index: number, updates: Partial<Noun>) => {
     setWordsList((prev) =>
       prev.map((word, i) => (i === index ? { ...word, ...updates } : word))
     );
@@ -81,9 +81,9 @@ export function Words() {
                       <td className="px-4 py-2">
                         <input
                           type="text"
-                          value={word.word}
+                          value={word.singular}
                           onChange={(e) =>
-                            updateWord(index, { word: e.target.value })
+                            updateWord(index, { singular: e.target.value })
                           }
                           className="w-full bg-transparent text-white font-medium px-2 py-1 rounded border border-transparent hover:border-slate-600 focus:border-slate-500 focus:outline-none"
                         />

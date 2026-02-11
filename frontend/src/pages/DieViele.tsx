@@ -101,7 +101,7 @@ export function DieViele() {
             {gameState.currentIndex + 1} / {gameState.words.length}
           </span>
           <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center">
-            {currentWord.article} {currentWord.word}
+            {currentWord.article} {currentWord.singular}
           </p>
         </div>
 

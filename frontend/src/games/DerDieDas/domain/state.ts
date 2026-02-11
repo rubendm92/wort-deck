@@ -1,7 +1,7 @@
-import type { Word, Article } from '../../domain/words.ts';
+import type { Noun, Article } from '../../domain/words.ts';
 
 export interface GameState {
-  words: Word[];
+  words: Noun[];
   currentIndex: number;
   selectedAnswer: Article | null;
   correctCount: number;
@@ -10,7 +10,7 @@ export interface GameState {
 
 export type ButtonState = 'default' | 'correct' | 'incorrect' | 'dimmed';
 
-export function createInitialState(words: Word[]): GameState {
+export function createInitialState(words: Noun[]): GameState {
   return {
     words,
     currentIndex: 0,
@@ -20,7 +20,7 @@ export function createInitialState(words: Word[]): GameState {
   };
 }
 
-export function getCurrentWord(state: GameState | null): Word | undefined {
+export function getCurrentWord(state: GameState | null): Noun | undefined {
   return state?.words[state.currentIndex];
 }
 

@@ -12,12 +12,12 @@ import {
   getScore,
   type GameState,
 } from './state';
-import type { Word } from '../../domain/words.ts';
+import type { Noun } from '../../domain/words.ts';
 
-const testWords: Word[] = [
-  { word: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },
-  { word: 'Banane', article: 'die', plural: 'Bananen', tags: [] },
-  { word: 'Brot', article: 'das', plural: 'Brote', tags: [] },
+const testWords: Noun[] = [
+  { singular: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },
+  { singular: 'Banane', article: 'die', plural: 'Bananen', tags: [] },
+  { singular: 'Brot', article: 'das', plural: 'Brote', tags: [] },
 ];
 
 function createTestState(overrides: Partial<GameState> = {}): GameState {
