@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
 import { type Noun, type Article } from '../games/domain/nouns.ts';
 import { loadNouns } from '../games/infrastructure/loadNouns.ts';
+import { saveNouns } from '../games/infrastructure/saveNouns.ts';
+import { useDebounce } from '../hooks/useDebounce.ts';
+
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export function Nouns() {
   const navigate = useNavigate();
   const [nounsList, setNounsList] = useState<Noun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
   useEffect(() => {
     loadNouns()
@@ -16,6 +21,26 @@ export function Nouns() {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSave = useCallback(async (nouns: Noun[]) => {
+    setSaveStatus('saving');
+    try {
+      await saveNouns(nouns);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch (e) {
+      setSaveStatus('error');
+      console.error('Failed to save nouns:', e);
+    }
+  }, []);
+
+  const debouncedSave = useDebounce(handleSave, 3000);
+
+  useEffect(() => {
+    if (!loading && nounsList.length > 0) {
+      debouncedSave(nounsList);
+    }
+  }, [nounsList, debouncedSave, loading]);
 
   const updateNoun = (index: number, updates: Partial<Noun>) => {
     setNounsList((prev) =>
@@ -58,8 +83,21 @@ export function Nouns() {
           <div className="text-red-400 text-center py-8">Error: {error}</div>
         ) : (
           <>
-            <div className="text-slate-400 text-sm mb-4">
-              {nounsList.length} Wörter
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-slate-400 text-sm">
+                {nounsList.length} Wörter
+              </div>
+              <div className="text-sm">
+                {saveStatus === 'saving' && (
+                  <span className="text-blue-400">Speichern...</span>
+                )}
+                {saveStatus === 'saved' && (
+                  <span className="text-emerald-400">✓ Gespeichert</span>
+                )}
+                {saveStatus === 'error' && (
+                  <span className="text-red-400">Fehler beim Speichern</span>
+                )}
+              </div>
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-slate-700">
