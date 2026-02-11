@@ -3,21 +3,22 @@ import { useNavigate } from 'react-router';
 import { DieVieleIcon } from '../games/DieViele/components/DieVieleIcon.tsx';
 import { GameLayout } from '../components/GameLayout.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { getWords, getTags } from '../games/domain/words.ts';
+import { getTags } from '../games/domain/words.ts';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import {
-  type GameState,
   createInitialState,
-  getCurrentWord,
-  updateAnswer,
-  submitAnswer,
-  nextWord,
   finishGame,
-  isLastWord,
+  type GameState,
+  getCurrentWord,
+  getScore,
   hasSubmitted,
   isAnswerCorrect,
-  getScore,
+  isLastWord,
+  nextWord,
+  submitAnswer,
+  updateAnswer,
 } from '../games/DieViele/domain/state.ts';
+import { loadAllNouns } from '../games/infrastructure/loadAllNouns.ts';
 
 const DEFAULT_WORD_COUNT = 10;
 
@@ -32,8 +33,8 @@ export function DieViele() {
   const availableTags = useMemo(() => getTags(), []);
 
   const startGame = useCallback(() => {
-    getWords({ count: wordCount, tags: selectedTags }).then((words) =>
-      setGameState(createInitialState(words))
+    loadAllNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
+      (words) => setGameState(createInitialState(words))
     );
   }, [wordCount, selectedTags]);
 

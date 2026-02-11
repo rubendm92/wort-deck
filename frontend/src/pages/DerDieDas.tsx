@@ -5,22 +5,23 @@ import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { getWords, getTags, type Article } from '../games/domain/words.ts';
+import { type Article, getTags } from '../games/domain/words.ts';
 import {
-  type GameState,
   createInitialState,
-  getCurrentWord,
-  isLastWord,
-  hasAnswered,
-  submitAnswer,
-  nextWord,
   finishGame,
-  getScore,
+  type GameState,
   getButtonState,
+  getCurrentWord,
+  getScore,
+  hasAnswered,
   isAnswerCorrect,
   isAnswerIncorrect,
+  isLastWord,
+  nextWord,
+  submitAnswer,
 } from '../games/DerDieDas/domain/state.ts';
 import { GameLayout } from '../components/GameLayout.tsx';
+import { loadAllNouns } from '../games/infrastructure/loadAllNouns.ts';
 
 const DEFAULT_WORD_COUNT = 10;
 
@@ -35,8 +36,8 @@ export function DerDieDas() {
   const availableTags = useMemo(() => getTags(), []);
 
   const startGame = useCallback(() => {
-    getWords({ count: wordCount, tags: selectedTags }).then((words) =>
-      setGameState(createInitialState(words))
+    loadAllNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
+      (words) => setGameState(createInitialState(words))
     );
   }, [wordCount, selectedTags]);
 

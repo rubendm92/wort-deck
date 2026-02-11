@@ -545,15 +545,6 @@ export const words: Noun[] = [
   },
 ];
 
-function shuffle<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 export function getTags(): string[] {
   const tagSet = new Set<string>();
   for (const word of words) {
@@ -562,23 +553,4 @@ export function getTags(): string[] {
     }
   }
   return Array.from(tagSet).sort();
-}
-
-export interface GetWordsOptions {
-  count: number;
-  tags?: string[];
-}
-
-export async function getWords(options: GetWordsOptions): Promise<Noun[]> {
-  const { count, tags } = options;
-  let filtered = words;
-
-  if (tags && tags.length > 0) {
-    filtered = words.filter(
-      (word) =>
-        word.tags.length === 0 || word.tags.some((tag) => tags.includes(tag))
-    );
-  }
-
-  return shuffle(filtered).slice(0, count);
 }
