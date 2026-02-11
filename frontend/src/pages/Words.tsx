@@ -1,15 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
-import {
-  words as initialWords,
-  type Word,
-  type Article,
-} from '../games/domain/words';
+import { type Word, type Article } from '../games/domain/words';
 
 export function Words() {
   const navigate = useNavigate();
-  const [wordsList, setWordsList] = useState<Word[]>(() => [...initialWords]);
+  const [wordsList, setWordsList] = useState<Word[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        const response = await fetch('/api/words');
+        if (!response.ok) {
+          throw new Error('Failed to fetch words');
+        }
+        const data = await response.json();
+        setWordsList(data.words);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWords();
+  }, []);
 
   const updateWord = (index: number, updates: Partial<Word>) => {
     setWordsList((prev) =>
@@ -44,9 +61,15 @@ export function Words() {
       </header>
 
       <main className="w-full max-w-4xl mt-16">
-        <div className="text-slate-400 text-sm mb-4">
-          {wordsList.length} Wörter
-        </div>
+        {loading ? (
+          <div className="text-slate-400 text-center py-8">Loading words...</div>
+        ) : error ? (
+          <div className="text-red-400 text-center py-8">Error: {error}</div>
+        ) : (
+          <>
+            <div className="text-slate-400 text-sm mb-4">
+              {wordsList.length} Wörter
+            </div>
 
         <div className="overflow-x-auto rounded-lg border border-slate-700">
           <table className="w-full text-left">
@@ -120,6 +143,8 @@ export function Words() {
             </tbody>
           </table>
         </div>
+          </>
+        )}
       </main>
     </PageLayout>
   );
