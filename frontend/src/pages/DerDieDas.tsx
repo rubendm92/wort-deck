@@ -5,7 +5,7 @@ import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { type Article } from '../games/domain/words.ts';
+import { type Article } from '../games/domain/nouns.ts';
 import { loadAllTags } from '../games/infrastructure/loadAllTags.ts';
 import {
   createInitialState,

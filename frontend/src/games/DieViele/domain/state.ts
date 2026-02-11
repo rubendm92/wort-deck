@@ -1,4 +1,4 @@
-import type { Noun } from '../../domain/words.ts';
+import type { Noun } from '../../domain/nouns.ts';
 
 export interface GameState {
   words: Noun[];

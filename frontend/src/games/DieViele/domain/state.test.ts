@@ -12,7 +12,7 @@ import {
   getScore,
   type GameState,
 } from './state';
-import type { Noun } from '../../domain/words.ts';
+import type { Noun } from '../../domain/nouns.ts';
 
 const testWords: Noun[] = [
   { singular: 'Apfel', article: 'der', plural: 'Äpfel', tags: [] },

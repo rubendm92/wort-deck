@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
-import { type Noun, type Article } from '../games/domain/words';
+import { type Noun, type Article } from '../games/domain/nouns.ts';
 import { loadNouns } from '../games/infrastructure/loadNouns.ts';
 
-export function Words() {
+export function Nouns() {
   const navigate = useNavigate();
-  const [wordsList, setWordsList] = useState<Noun[]>([]);
+  const [nounsList, setNounsList] = useState<Noun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadNouns()
-      .then(setWordsList)
+      .then(setNounsList)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const updateWord = (index: number, updates: Partial<Noun>) => {
-    setWordsList((prev) =>
-      prev.map((word, i) => (i === index ? { ...word, ...updates } : word))
+  const updateNoun = (index: number, updates: Partial<Noun>) => {
+    setNounsList((prev) =>
+      prev.map((noun, i) => (i === index ? { ...noun, ...updates } : noun))
     );
   };
 
@@ -52,14 +52,14 @@ export function Words() {
       <main className="w-full max-w-4xl mt-16">
         {loading ? (
           <div className="text-slate-400 text-center py-8">
-            Loading words...
+            Loading nouns...
           </div>
         ) : error ? (
           <div className="text-red-400 text-center py-8">Error: {error}</div>
         ) : (
           <>
             <div className="text-slate-400 text-sm mb-4">
-              {wordsList.length} Wörter
+              {nounsList.length} Wörter
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-slate-700">
@@ -73,7 +73,7 @@ export function Words() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
-                  {wordsList.map((word, index) => (
+                  {nounsList.map((noun, index) => (
                     <tr
                       key={index}
                       className="bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
@@ -81,18 +81,18 @@ export function Words() {
                       <td className="px-4 py-2">
                         <input
                           type="text"
-                          value={word.singular}
+                          value={noun.singular}
                           onChange={(e) =>
-                            updateWord(index, { singular: e.target.value })
+                            updateNoun(index, { singular: e.target.value })
                           }
                           className="w-full bg-transparent text-white font-medium px-2 py-1 rounded border border-transparent hover:border-slate-600 focus:border-slate-500 focus:outline-none"
                         />
                       </td>
                       <td className="px-4 py-2">
                         <select
-                          value={word.article}
+                          value={noun.article}
                           onChange={(e) =>
-                            updateWord(index, {
+                            updateNoun(index, {
                               article: e.target.value as Article,
                             })
                           }
@@ -106,9 +106,9 @@ export function Words() {
                       <td className="px-4 py-2">
                         <input
                           type="text"
-                          value={word.plural}
+                          value={noun.plural}
                           onChange={(e) =>
-                            updateWord(index, { plural: e.target.value })
+                            updateNoun(index, { plural: e.target.value })
                           }
                           className="w-full bg-transparent text-slate-300 px-2 py-1 rounded border border-transparent hover:border-slate-600 focus:border-slate-500 focus:outline-none"
                         />
@@ -116,9 +116,9 @@ export function Words() {
                       <td className="px-4 py-2">
                         <input
                           type="text"
-                          value={word.tags.join(', ')}
+                          value={noun.tags.join(', ')}
                           onChange={(e) =>
-                            updateWord(index, {
+                            updateNoun(index, {
                               tags: e.target.value
                                 .split(',')
                                 .map((t) => t.trim())
