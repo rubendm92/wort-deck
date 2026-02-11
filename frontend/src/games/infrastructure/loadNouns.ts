@@ -4,7 +4,7 @@ export interface LoadAllNounsOptions {
   shuffle?: boolean;
 }
 
-export async function loadAllNouns(options?: LoadAllNounsOptions) {
+export async function loadNouns(options?: LoadAllNounsOptions) {
   try {
     const params = new URLSearchParams();
 

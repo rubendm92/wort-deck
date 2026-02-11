@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DieVieleIcon } from '../games/DieViele/components/DieVieleIcon.tsx';
 import { GameLayout } from '../components/GameLayout.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { getTags } from '../games/domain/words.ts';
+import { loadAllTags } from '../games/infrastructure/loadAllTags.ts';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import {
   createInitialState,
@@ -18,7 +18,7 @@ import {
   submitAnswer,
   updateAnswer,
 } from '../games/DieViele/domain/state.ts';
-import { loadAllNouns } from '../games/infrastructure/loadAllNouns.ts';
+import { loadNouns } from '../games/infrastructure/loadNouns.ts';
 
 const DEFAULT_WORD_COUNT = 10;
 
@@ -27,13 +27,19 @@ const GAME_NAME = 'Die Viele';
 export function DieViele() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [wordCount, setWordCount] = useState(DEFAULT_WORD_COUNT);
-  const [selectedTags, setSelectedTags] = useState<string[]>(() => getTags());
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const availableTags = useMemo(() => getTags(), []);
+  useEffect(() => {
+    loadAllTags().then((tags) => {
+      setAvailableTags(tags);
+      setSelectedTags(tags);
+    });
+  }, []);
 
   const startGame = useCallback(() => {
-    loadAllNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
+    loadNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
       (words) => setGameState(createInitialState(words))
     );
   }, [wordCount, selectedTags]);

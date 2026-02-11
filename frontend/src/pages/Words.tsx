@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
 import { type Noun, type Article } from '../games/domain/words';
-import { loadAllNouns } from '../games/infrastructure/loadAllNouns.ts';
+import { loadNouns } from '../games/infrastructure/loadNouns.ts';
 
 export function Words() {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ export function Words() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadAllNouns()
+    loadNouns()
       .then(setWordsList)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));

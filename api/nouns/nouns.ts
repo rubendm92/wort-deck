@@ -426,3 +426,14 @@ export function all(options: GetNounsOptions = {}): Noun[] {
 
   return filtered;
 }
+
+export function tags(): string[] {
+  const nouns = all({});
+  const tags = new Set<string>();
+  for (const noun of nouns) {
+    for (const tag of noun.tags) {
+      tags.add(tag);
+    }
+  }
+  return Array.from(tags).sort();
+}

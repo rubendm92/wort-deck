@@ -1,11 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { DerDieDasIcon } from '../games/DerDieDas/components/DerDieDasIcon.tsx';
 import { AnswerButton } from '../games/DerDieDas/components/AnswerButton.tsx';
 import { WordPanel } from '../games/DerDieDas/components/WordPanel.tsx';
 import { GameResult } from '../games/DerDieDas/components/GameResult.tsx';
 import { GameSetup } from '../components/GameSetup.tsx';
-import { type Article, getTags } from '../games/domain/words.ts';
+import { type Article } from '../games/domain/words.ts';
+import { loadAllTags } from '../games/infrastructure/loadAllTags.ts';
 import {
   createInitialState,
   finishGame,
@@ -21,7 +22,7 @@ import {
   submitAnswer,
 } from '../games/DerDieDas/domain/state.ts';
 import { GameLayout } from '../components/GameLayout.tsx';
-import { loadAllNouns } from '../games/infrastructure/loadAllNouns.ts';
+import { loadNouns } from '../games/infrastructure/loadNouns.ts';
 
 const DEFAULT_WORD_COUNT = 10;
 
@@ -30,13 +31,19 @@ const GAME_NAME = 'Der Die Das';
 export function DerDieDas() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [wordCount, setWordCount] = useState(DEFAULT_WORD_COUNT);
-  const [selectedTags, setSelectedTags] = useState<string[]>(() => getTags());
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const availableTags = useMemo(() => getTags(), []);
+  useEffect(() => {
+    loadAllTags().then((tags) => {
+      setAvailableTags(tags);
+      setSelectedTags(tags);
+    });
+  }, []);
 
   const startGame = useCallback(() => {
-    loadAllNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
+    loadNouns({ count: wordCount, tags: selectedTags, shuffle: true }).then(
       (words) => setGameState(createInitialState(words))
     );
   }, [wordCount, selectedTags]);
