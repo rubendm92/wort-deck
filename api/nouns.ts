@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Invalid request: nouns array required' });
   }
 
-  await repository.upsert(nouns);
+  await repository.save(nouns);
 
   res.status(200).json({ success: true, count: nouns.length });
 }

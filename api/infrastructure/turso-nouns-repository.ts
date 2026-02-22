@@ -13,7 +13,7 @@ export class TursoNounsRepository implements NounsRepository {
     }));
   }
 
-  async upsert(nouns: Noun[]): Promise<void> {
+  async save(nouns: Noun[]): Promise<void> {
     await db.batch(
       nouns.map((noun) => ({
         sql: `INSERT INTO nouns (singular, article, plural, tags)
