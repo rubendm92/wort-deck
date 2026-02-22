@@ -8,13 +8,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { changes } = req.body;
+  const { nouns } = req.body;
 
-  if (!changes || !Array.isArray(changes)) {
-    return res.status(400).json({ error: 'Invalid request: changes array required' });
+  if (!nouns || !Array.isArray(nouns)) {
+    return res.status(400).json({ error: 'Invalid request: nouns array required' });
   }
 
-  await repository.saveChanges(changes);
+  await repository.upsert(nouns);
 
-  res.status(200).json({ success: true, count: changes.length });
+  res.status(200).json({ success: true, count: nouns.length });
 }

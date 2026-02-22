@@ -9,6 +9,9 @@ const __dirname = dirname(__filename);
 async function migrate() {
   console.log('Starting migration...');
 
+  // Drop non-unique singular index if it exists so schema can recreate it as unique
+  await db.execute('DROP INDEX IF EXISTS idx_nouns_singular');
+
   // Read and execute schema
   const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf-8');
   const statements = schema

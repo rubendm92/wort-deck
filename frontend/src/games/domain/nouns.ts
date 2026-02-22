@@ -6,8 +6,3 @@ export interface Noun {
   plural: string;
   tags: string[];
 }
-
-export interface NounChange {
-  original: string; // original singular, used as identifier
-  noun: Noun;
-}

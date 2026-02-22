@@ -13,7 +13,3 @@ export interface GetNounsOptions {
   shuffle?: boolean;
 }
 
-export interface NounChange {
-  original: string; // original singular, used as identifier
-  noun: Noun;
-}

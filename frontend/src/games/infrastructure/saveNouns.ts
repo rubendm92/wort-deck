@@ -1,12 +1,12 @@
-import { type NounChange } from '../domain/nouns.ts';
+import { type Noun } from '../domain/nouns.ts';
 
-export async function saveChanges(changes: NounChange[]): Promise<void> {
+export async function upsertNouns(nouns: Noun[]): Promise<void> {
   const response = await fetch('/api/nouns', {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ changes }),
+    body: JSON.stringify({ nouns }),
   });
 
   if (!response.ok) {
