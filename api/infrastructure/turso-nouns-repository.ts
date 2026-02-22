@@ -12,4 +12,19 @@ export class TursoNounsRepository implements NounsRepository {
       tags: JSON.parse(row.tags as string) as string[],
     }));
   }
+
+  async save(nouns: Noun[]): Promise<void> {
+    await db.batch(
+      nouns.map((noun) => ({
+        sql: `INSERT INTO nouns (singular, article, plural, tags)
+              VALUES (?, ?, ?, ?)
+              ON CONFLICT(singular) DO UPDATE SET
+                article = excluded.article,
+                plural = excluded.plural,
+                tags = excluded.tags,
+                updated_at = CURRENT_TIMESTAMP`,
+        args: [noun.singular, noun.article, noun.plural, JSON.stringify(noun.tags)],
+      })),
+    );
+  }
 }

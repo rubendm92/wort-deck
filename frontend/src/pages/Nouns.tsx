@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
 import { type Noun, type Article } from '../games/domain/nouns.ts';
 import { loadNouns } from '../games/infrastructure/loadNouns.ts';
-import { saveNouns } from '../games/infrastructure/saveNouns.ts';
+import { upsertNouns } from '../games/infrastructure/saveNouns.ts';
 import { useDebounce } from '../hooks/useDebounce.ts';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+type AddStatus = 'idle' | 'saving' | 'error';
+
+const EMPTY_NOUN: Noun = { singular: '', article: 'der', plural: '', tags: [] };
 
 export function Nouns() {
   const navigate = useNavigate();
@@ -14,18 +17,30 @@ export function Nouns() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [dirtyIndices, setDirtyIndices] = useState<Set<number>>(new Set());
+  const savedSnapshot = useRef<Noun[]>([]);
+
+  const [newNoun, setNewNoun] = useState<Noun>(EMPTY_NOUN);
+  const [newTags, setNewTags] = useState('');
+  const [addStatus, setAddStatus] = useState<AddStatus>('idle');
+  const singularRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadNouns()
-      .then(setNounsList)
+      .then((nouns) => {
+        setNounsList(nouns);
+        savedSnapshot.current = nouns;
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSave = useCallback(async (nouns: Noun[]) => {
+  const handleSave = useCallback(async (dirtyNouns: Noun[], snapshot: Noun[]) => {
     setSaveStatus('saving');
     try {
-      await saveNouns(nouns);
+      await upsertNouns(dirtyNouns);
+      savedSnapshot.current = snapshot;
+      setDirtyIndices(new Set());
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (e) {
@@ -37,15 +52,44 @@ export function Nouns() {
   const debouncedSave = useDebounce(handleSave, 3000);
 
   useEffect(() => {
-    if (!loading && nounsList.length > 0) {
-      debouncedSave(nounsList);
-    }
-  }, [nounsList, debouncedSave, loading]);
+    if (loading || dirtyIndices.size === 0) return;
+
+    const dirtyNouns = [...dirtyIndices].map((index) => nounsList[index]);
+    debouncedSave(dirtyNouns, nounsList);
+  }, [nounsList, dirtyIndices, loading, debouncedSave]);
 
   const updateNoun = (index: number, updates: Partial<Noun>) => {
     setNounsList((prev) =>
       prev.map((noun, i) => (i === index ? { ...noun, ...updates } : noun))
     );
+    setDirtyIndices((prev) => new Set([...prev, index]));
+  };
+
+  const handleAddNoun = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNoun.singular.trim() || !newNoun.plural.trim()) return;
+
+    const noun: Noun = {
+      ...newNoun,
+      singular: newNoun.singular.trim(),
+      plural: newNoun.plural.trim(),
+      tags: newTags
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0),
+    };
+
+    setAddStatus('saving');
+    try {
+      await upsertNouns([noun]);
+      setNounsList((prev) => [noun, ...prev]);
+      setNewNoun(EMPTY_NOUN);
+      setNewTags('');
+      setAddStatus('idle');
+      singularRef.current?.focus();
+    } catch {
+      setAddStatus('error');
+    }
   };
 
   return (
@@ -74,7 +118,76 @@ export function Nouns() {
         </h1>
       </header>
 
-      <main className="w-full max-w-4xl mt-16">
+      <main className="w-full max-w-4xl mt-16 flex flex-col gap-6">
+        {/* Add noun form */}
+        <form
+          onSubmit={handleAddNoun}
+          className="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-4 flex flex-col sm:flex-row gap-3 items-end"
+        >
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="text-slate-400 text-xs font-medium">Wort</label>
+            <input
+              ref={singularRef}
+              type="text"
+              value={newNoun.singular}
+              onChange={(e) => setNewNoun((n) => ({ ...n, singular: e.target.value }))}
+              placeholder="Hund"
+              required
+              className="bg-slate-700 text-white px-3 py-2 rounded border border-slate-600 focus:border-slate-400 focus:outline-none placeholder:text-slate-500"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 shrink-0">
+            <label className="text-slate-400 text-xs font-medium">Artikel</label>
+            <select
+              value={newNoun.article}
+              onChange={(e) => setNewNoun((n) => ({ ...n, article: e.target.value as Article }))}
+              className="bg-slate-700 text-slate-300 px-3 py-2 rounded border border-slate-600 focus:border-slate-400 focus:outline-none cursor-pointer"
+            >
+              <option value="der">der</option>
+              <option value="die">die</option>
+              <option value="das">das</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="text-slate-400 text-xs font-medium">Plural</label>
+            <input
+              type="text"
+              value={newNoun.plural}
+              onChange={(e) => setNewNoun((n) => ({ ...n, plural: e.target.value }))}
+              placeholder="Hunde"
+              required
+              className="bg-slate-700 text-slate-300 px-3 py-2 rounded border border-slate-600 focus:border-slate-400 focus:outline-none placeholder:text-slate-500"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="text-slate-400 text-xs font-medium">Tags</label>
+            <input
+              type="text"
+              value={newTags}
+              onChange={(e) => setNewTags(e.target.value)}
+              placeholder="tag1, tag2"
+              className="bg-slate-700 text-slate-300 px-3 py-2 rounded border border-slate-600 focus:border-slate-400 focus:outline-none placeholder:text-slate-500"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 shrink-0">
+            {addStatus === 'error' && (
+              <span className="text-red-400 text-xs text-right">Fehler</span>
+            )}
+            <button
+              type="submit"
+              disabled={addStatus === 'saving'}
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded transition-colors cursor-pointer"
+            >
+              {addStatus === 'saving' ? '...' : '+ Hinzufügen'}
+            </button>
+          </div>
+        </form>
+
+        {/* Noun list */}
         {loading ? (
           <div className="text-slate-400 text-center py-8">
             Loading nouns...
@@ -83,7 +196,7 @@ export function Nouns() {
           <div className="text-red-400 text-center py-8">Error: {error}</div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <div className="text-slate-400 text-sm">
                 {nounsList.length} Wörter
               </div>

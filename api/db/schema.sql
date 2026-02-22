@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS nouns (
 );
 
 CREATE INDEX IF NOT EXISTS idx_nouns_article ON nouns(article);
-CREATE INDEX IF NOT EXISTS idx_nouns_singular ON nouns(singular);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_nouns_singular ON nouns(singular);
