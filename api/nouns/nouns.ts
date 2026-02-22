@@ -1,11 +1,5 @@
-export type Article = 'der' | 'die' | 'das';
-
-export interface Noun {
-  singular: string;
-  article: Article;
-  plural: string;
-  tags: string[];
-}
+import type { Noun } from '../domain/noun.js';
+import * as nounService from '../domain/noun-service.js';
 
 export const nouns: Noun[] = [
   {
@@ -390,50 +384,10 @@ export const nouns: Noun[] = [
   },
 ];
 
-function shuffle<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
+export function all(options: import('../domain/noun.js').GetNounsOptions = {}) {
+  return nounService.all(nouns, options);
 }
 
-export interface GetNounsOptions {
-  count?: number;
-  tags?: string[];
-  shuffle?: boolean;
-}
-
-export function all(options: GetNounsOptions = {}): Noun[] {
-  const { count, tags } = options;
-  let filtered = nouns;
-
-  if (tags && tags.length > 0) {
-    filtered = nouns.filter(
-        (noun) =>
-            noun.tags.length === 0 || noun.tags.some((tag) => tags.includes(tag))
-    );
-  }
-  if (options.shuffle) {
-    filtered = shuffle(filtered);
-  } else {
-    filtered = filtered.sort((a, b) => a.singular.localeCompare(b.singular));
-  }
-  if (options.count != null) {
-    filtered = filtered.slice(0, count);
-  }
-
-  return filtered;
-}
-
-export function tags(): string[] {
-  const nouns = all({});
-  const tags = new Set<string>();
-  for (const noun of nouns) {
-    for (const tag of noun.tags) {
-      tags.add(tag);
-    }
-  }
-  return Array.from(tags).sort();
+export function tags() {
+  return nounService.tags(nouns);
 }
