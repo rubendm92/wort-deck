@@ -5,7 +5,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // TODO: Implement actual save logic
+  // TODO: Implement actual save logic with Turso
   // Expected body: { nouns: Noun[] }
 
   const { nouns } = req.body;
