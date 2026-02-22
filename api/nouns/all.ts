@@ -1,7 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { all } from './nouns.js';
+import { TursoNounsRepository } from '../infrastructure/turso-nouns-repository.js';
+import * as nounService from '../domain/noun-service.js';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+const repository = new TursoNounsRepository();
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -14,7 +17,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
         shuffle: shuffle === 'true',
     };
 
-    const nouns = all(options);
+    const allNouns = await repository.findAll();
+    const nouns = nounService.all(allNouns, options);
 
     res.status(200).json({
         nouns,
