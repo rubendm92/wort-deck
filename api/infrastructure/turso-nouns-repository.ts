@@ -1,5 +1,5 @@
 import { db } from '../db/client.js';
-import type { Noun, Article } from '../domain/noun.js';
+import type { Noun, Article, NounChange } from '../domain/noun.js';
 import type { NounsRepository } from '../domain/nouns-repository.js';
 
 export class TursoNounsRepository implements NounsRepository {
@@ -13,13 +13,12 @@ export class TursoNounsRepository implements NounsRepository {
     }));
   }
 
-  async save(nouns: Noun[]): Promise<void> {
-    await db.batch([
-      'DELETE FROM nouns',
-      ...nouns.map((noun) => ({
-        sql: 'INSERT INTO nouns (singular, article, plural, tags) VALUES (?, ?, ?, ?)',
-        args: [noun.singular, noun.article, noun.plural, JSON.stringify(noun.tags)],
+  async saveChanges(changes: NounChange[]): Promise<void> {
+    await db.batch(
+      changes.map(({ original, noun }) => ({
+        sql: 'UPDATE nouns SET singular = ?, article = ?, plural = ?, tags = ?, updated_at = CURRENT_TIMESTAMP WHERE singular = ?',
+        args: [noun.singular, noun.article, noun.plural, JSON.stringify(noun.tags), original],
       })),
-    ]);
+    );
   }
 }

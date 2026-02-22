@@ -12,3 +12,8 @@ export interface GetNounsOptions {
   tags?: string[];
   shuffle?: boolean;
 }
+
+export interface NounChange {
+  original: string; // original singular, used as identifier
+  noun: Noun;
+}

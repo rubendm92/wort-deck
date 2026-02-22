@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { PageLayout } from '../components/PageLayout';
-import { type Noun, type Article } from '../games/domain/nouns.ts';
+import { type Noun, type Article, type NounChange } from '../games/domain/nouns.ts';
 import { loadNouns } from '../games/infrastructure/loadNouns.ts';
-import { saveNouns } from '../games/infrastructure/saveNouns.ts';
+import { saveChanges } from '../games/infrastructure/saveNouns.ts';
 import { useDebounce } from '../hooks/useDebounce.ts';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -14,18 +14,25 @@ export function Nouns() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [dirtyIndices, setDirtyIndices] = useState<Set<number>>(new Set());
+  const originalNouns = useRef<Noun[]>([]);
 
   useEffect(() => {
     loadNouns()
-      .then(setNounsList)
+      .then((nouns) => {
+        setNounsList(nouns);
+        originalNouns.current = nouns;
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  const handleSave = useCallback(async (nouns: Noun[]) => {
+  const handleSave = useCallback(async (changes: NounChange[], snapshot: Noun[]) => {
     setSaveStatus('saving');
     try {
-      await saveNouns(nouns);
+      await saveChanges(changes);
+      originalNouns.current = snapshot;
+      setDirtyIndices(new Set());
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (e) {
@@ -37,15 +44,21 @@ export function Nouns() {
   const debouncedSave = useDebounce(handleSave, 3000);
 
   useEffect(() => {
-    if (!loading && nounsList.length > 0) {
-      debouncedSave(nounsList);
-    }
-  }, [nounsList, debouncedSave, loading]);
+    if (loading || dirtyIndices.size === 0) return;
+
+    const changes = [...dirtyIndices].map((index) => ({
+      original: originalNouns.current[index].singular,
+      noun: nounsList[index],
+    }));
+
+    debouncedSave(changes, nounsList);
+  }, [nounsList, dirtyIndices, loading, debouncedSave]);
 
   const updateNoun = (index: number, updates: Partial<Noun>) => {
     setNounsList((prev) =>
       prev.map((noun, i) => (i === index ? { ...noun, ...updates } : noun))
     );
+    setDirtyIndices((prev) => new Set([...prev, index]));
   };
 
   return (
