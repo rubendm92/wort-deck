@@ -6,22 +6,21 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-async function migrate() {
-  console.log('Starting migration...');
-
-  // Drop non-unique singular index if it exists so schema can recreate it as unique
-  await db.execute('DROP INDEX IF EXISTS idx_nouns_singular');
-
-  // Read and execute schema
+async function executeSchema() {
   const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf-8');
   const statements = schema
-    .split(';')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+      .split(';')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
   for (const statement of statements) {
     await db.execute(statement);
   }
+}
+
+async function migrate() {
+  console.log('Starting migration...');
+  await executeSchema();
   console.log('✓ Schema created');
   console.log('Migration complete!');
 }
